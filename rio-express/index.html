@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RioExpress - Premier Delivery in Morong, Bataan</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#E53935">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="rio-header">
+    <div>
+      <div class="rio-brand-title">RIOEXPRESS</div>
+      <div class="rio-brand-sub">Powered by Bataan Creation</div>
+    </div>
+    <div>
+      <button onclick="setLanguage(currentLanguage === 'en' ? 'tag' : 'en')" style="background:rgba(255,255,255,0.1); color:#FFF; border:1px solid rgba(255,255,255,0.2); padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer;">
+        🌐 EN / TAG
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="rio-container">
+
+    <!-- Hero Identity Card -->
+    <div class="rio-card rio-card-gold" style="text-align: center;">
+      <h2 style="color: #FFD700; font-size: 18px; margin-bottom: 5px;" data-i18n="appName">RioExpress</h2>
+      <p style="font-size: 13px; color: #CBD5E1;" data-i18n="tagline">Premier Delivery & Logistics in Morong, Bataan</p>
+    </div>
+
+    <!-- Login & Access Gateway Card -->
+    <div class="rio-card">
+      <div class="rio-card-title">
+        <span>🔐 Gateway Access</span>
+        <span class="rio-badge-verified">Secured System</span>
+      </div>
+
+      <label style="font-size: 12px; color: #94A3B8;">Mobile Number / Account Phone</label>
+      <input type="tel" id="login-phone" class="rio-input" placeholder="09XXXXXXXXX" value="09365810610">
+
+      <label style="font-size: 12px; color: #94A3B8;">Account Password</label>
+      <input type="password" id="login-password" class="rio-input" placeholder="••••••••" value="password123">
+
+      <button id="login-btn" class="rio-btn-primary" onclick="handleLoginPortal()">
+        ENTER DASHBOARD
+      </button>
+
+      <div style="margin-top: 15px; text-align: center;">
+        <button onclick="showGuidelinesModal('CUSTOMER')" style="background:none; border:none; color:#FFD700; font-size:12px; text-decoration:underline; cursor:pointer;">
+          📖 View Terms, Guidelines & Anti-Scam Rules
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Role Test Switcher (Demo / Development Mode) -->
+    <div class="rio-card" style="border-style: dashed; border-color: rgba(255,215,0,0.3);">
+      <div style="font-size: 12px; color: #FFD700; font-weight: bold; margin-bottom: 10px;">⚡ Quick Portal Access (Role Demo):</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <button onclick="demoLogin('CUSTOMER')" style="background:rgba(255,255,255,0.05); color:#FFF; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:8px; font-size:11px; cursor:pointer;">
+          📱 Customer Portal
+        </button>
+        <button onclick="demoLogin('RIDER')" style="background:rgba(255,255,255,0.05); color:#FFF; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:8px; font-size:11px; cursor:pointer;">
+          🛵 Rider Terminal
+        </button>
+        <button onclick="demoLogin('MERCHANT')" style="background:rgba(255,255,255,0.05); color:#FFF; border:1px solid rgba(255,255,255,0.1); padding:10px; border-radius:8px; font-size:11px; cursor:pointer;">
+          🏪 Merchant Portal
+        </button>
+        <button onclick="demoLogin('SUPER_ADMIN')" style="background:rgba(229,57,53,0.2); color:#FF8A80; border:1px solid #E53935; padding:10px; border-radius:8px; font-size:11px; cursor:pointer;">
+          🛡️ Admin Control
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="rio-footer">
+    Developed & Powered by <strong>Bataan Creation</strong><br>
+    Owner: Reynold P. Rio (09365810610 / bataancreation@gmail.com)
+  </footer>
+
+  <!-- Include All Required Core Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/guidelines.js"></script>
+  <script src="assets/js/chatbot.js"></script>
+
+  <script>
+    // Initialize Chatbot UI Widget on Gateway
+    window.addEventListener('DOMContentLoaded', () => {
+      RioChatbot.initChatbotUI();
+      
+      // Auto-dispatch if already logged in
+      const user = RioAuth.getCurrentUser();
+      if (user) {
+        // RioAuth.dispatchUserToDashboard(user);
+      }
+    });
+
+    // Handle Login Action with Cooldown
+    function handleLoginPortal() {
+      const btn = document.getElementById('login-btn');
+      const phone = document.getElementById('login-phone').value;
+
+      RioEngine.applyButtonCooldown(btn, () => {
+        if (!phone) {
+          alert('Please enter a valid mobile number.');
+          return;
+        }
+
+        // Simulate Login Session (Default to Customer unless specified)
+        const mockUser = {
+          id: 'usr-101',
+          fullName: 'Test User Morong',
+          phoneNumber: phone,
+          role: 'CUSTOMER',
+          kyc_status: 'VERIFIED',
+          unpaid_balance: 0.00,
+          is_banned: false
+        };
+
+        RioAuth.saveSession(mockUser, 'mock_jwt_token_123');
+        RioAuth.dispatchUserToDashboard(mockUser);
+      });
+    }
+
+    // Demo Login Role Switcher
+    function demoLogin(role) {
+      const mockUser = {
+        id: 'usr-demo-' + role.toLowerCase(),
+        fullName: 'Demo ' + role,
+        phoneNumber: '09365810610',
+        role: role,
+        kyc_status: 'VERIFIED',
+        unpaid_balance: 0.00,
+        is_banned: false
+      };
+
+      RioAuth.saveSession(mockUser, 'mock_token_' + role);
+      RioAuth.dispatchUserToDashboard(mockUser);
+    }
+  </script>
+</body>
+</html>

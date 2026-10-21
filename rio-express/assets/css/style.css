@@ -1,0 +1,167 @@
+/* ====================================================================
+   RIOEXPRESS HIGH-END GLASSMORPHISM UI SYSTEM
+   Developed & Powered by: Bataan Creation
+   Target Platform: iOS (iPhone/iPad/Mac), Android, & Responsive PWA
+   ==================================================================== */
+
+:root {
+  --primary-red: #E53935;
+  --primary-red-dark: #D32F2F;
+  --bg-space-navy: #0A1128;
+  --card-slate-dark: #0F172A;
+  --text-pure-white: #FFFFFF;
+  --text-slate-muted: #94A3B8;
+  --gold-accent: #FFD700;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Global Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-space-navy);
+  color: var(--text-pure-white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 40px;
+}
+
+/* App Header & Top Navigation Bar */
+.rio-header {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.rio-brand-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--primary-red);
+  letter-spacing: -0.5px;
+}
+
+.rio-brand-sub {
+  font-size: 10px;
+  color: var(--gold-accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Main Container Shell */
+.rio-container {
+  width: 100%;
+  max-width: 480px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Glassmorphism Cards */
+.rio-card {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--glass-shadow);
+}
+
+.rio-card-gold {
+  border: 1px solid var(--gold-accent);
+  background: rgba(255, 215, 0, 0.05);
+}
+
+.rio-card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-pure-white);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* High-End Primary Action Button */
+.rio-btn-primary {
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary-red), var(--primary-red-dark));
+  color: var(--text-pure-white);
+  border: none;
+  padding: 16px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(229, 57, 53, 0.3);
+  transition: transform 0.1s ease, opacity 0.2s ease;
+}
+
+.rio-btn-primary:active {
+  transform: scale(0.97);
+}
+
+.rio-btn-primary:disabled {
+  background: #475569;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Inputs & Select Elements */
+.rio-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 14px;
+  color: var(--text-pure-white);
+  font-size: 14px;
+  outline: none;
+  margin-top: 6px;
+  margin-bottom: 12px;
+}
+
+.rio-input:focus {
+  border-color: var(--primary-red);
+}
+
+/* Badges */
+.rio-badge-verified {
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--gold-accent);
+  border: 1px solid var(--gold-accent);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* Footer Attribution */
+.rio-footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-slate-muted);
+  margin-top: 30px;
+  letter-spacing: 0.5px;
+}

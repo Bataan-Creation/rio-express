@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RioExpress - Bataan Creation Admin Control</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#E53935">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="rio-header">
+    <div>
+      <div class="rio-brand-title">RIOEXPRESS</div>
+      <div class="rio-brand-sub">Bataan Creation Admin Portal</div>
+    </div>
+    <div>
+      <button onclick="RioAuth.logout()" style="background:rgba(229,57,53,0.2); color:#FF8A80; border:1px solid #E53935; padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer;">
+        LOGOUT
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="rio-container">
+
+    <!-- Admin Master Banner -->
+    <div class="rio-card rio-card-gold" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:11px; color:#94A3B8;">Platform Owner & Developer</div>
+        <div style="font-size:15px; font-weight:bold; color:#FFD700;">Reynold P. Rio</div>
+      </div>
+      <span class="rio-badge-verified">SUPER ADMIN</span>
+    </div>
+
+    <!-- Dynamic Fuel Matrix Controller Card -->
+    <div class="rio-card">
+      <div class="rio-card-title">
+        <span>⛽ Dynamic Fuel Fare Rate Controller</span>
+      </div>
+
+      <label style="font-size: 12px; color: #94A3B8;">Current Gasoline Price in Morong (PHP / Liter)</label>
+      <input type="number" id="admin-gas-price" class="rio-input" value="72.00" step="0.5">
+
+      <label style="font-size: 12px; color: #94A3B8;">Base Fare Floor Rate (PHP)</label>
+      <input type="number" id="admin-base-fare" class="rio-input" value="40.00" step="1.0">
+
+      <button id="update-fuel-btn" class="rio-btn-primary" onclick="handleUpdateFuelConfig()">
+        UPDATE MORONG FUEL MATRIX
+      </button>
+    </div>
+
+    <!-- KYC Identity Verification Approvals Card -->
+    <div class="rio-card">
+      <div class="rio-card-title">
+        <span>🛡️ KYC Verification Queue</span>
+        <span class="rio-badge-verified">1 Pending</span>
+      </div>
+
+      <div style="font-size:13px; color:#CBD5E1; line-height:1.8; margin-bottom:15px; background:rgba(255,255,255,0.03); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.05);">
+        <div>Applicant: <strong>Juan Dela Cruz (Rider Applicant)</strong></div>
+        <div>Phone: <strong>09123456789</strong></div>
+        <div>ID Type: <strong>Driver's License / UMID</strong></div>
+        <div style="margin-top:8px; display:flex; gap:10px;">
+          <a href="#" onclick="alert('Viewing Submitted Valid ID Document...')" style="color:#FFD700; font-size:11px;">[View Valid ID]</a>
+          <a href="#" onclick="alert('Viewing Submitted Live Selfie...')" style="color:#FFD700; font-size:11px;">[View Live Selfie]</a>
+        </div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <button id="approve-kyc-btn" class="rio-btn-primary" onclick="handleKycAction('VERIFIED')" style="background:linear-gradient(135deg, #22C55E, #15803D);">
+          APPROVE IDENTITY
+        </button>
+        <button id="reject-kyc-btn" class="rio-btn-primary" onclick="handleKycAction('REJECTED')" style="background:linear-gradient(135deg, #E53935, #D32F2F);">
+          REJECT / FLAG
+        </button>
+      </div>
+    </div>
+
+    <!-- Rider COD Remittance Ledger Card -->
+    <div class="rio-card">
+      <div class="rio-card-title">
+        <span>💵 Rider Remittance Audit Ledger</span>
+      </div>
+
+      <label style="font-size: 12px; color: #94A3B8;">Select Rider Account</label>
+      <select id="remit-rider-id" class="rio-input" style="background:#0F172A;">
+        <option value="r-101">Rider Marco (Cash Held: ₱1,250.00)</option>
+        <option value="r-102">Rider Leo (Cash Held: ₱800.00)</option>
+      </select>
+
+      <label style="font-size: 12px; color: #94A3B8;">Remittance Amount Received via GCash 09365810610 (PHP)</label>
+      <input type="number" id="remit-amount" class="rio-input" placeholder="e.g. 1000">
+
+      <button id="record-remit-btn" class="rio-btn-primary" onclick="handleRecordRemittance()">
+        RECORD REMITTANCE & RESET BALANCE
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="rio-footer">
+    Developed & Powered by <strong>Bataan Creation</strong><br>
+    Owner: Reynold P. Rio (09365810610 / bataancreation@gmail.com)
+  </footer>
+
+  <!-- Required Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/admin.js"></script>
+  <script src="assets/js/guidelines.js"></script>
+  <script src="assets/js/chatbot.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      RioAuth.enforcePageGuard('SUPER_ADMIN');
+      RioChatbot.initChatbotUI();
+    });
+
+    function handleUpdateFuelConfig() {
+      const btn = document.getElementById('update-fuel-btn');
+      const gasPrice = parseFloat(document.getElementById('admin-gas-price').value);
+      const baseFare = parseFloat(document.getElementById('admin-base-fare').value);
+
+      RioEngine.applyButtonCooldown(btn, () => {
+        const res = RioAdmin.updateFuelMatrixConfig(gasPrice, baseFare);
+        if (res.success) {
+          alert(res.message);
+        } else {
+          alert(res.message);
+        }
+      });
+    }
+
+    function handleKycAction(decision) {
+      const btn = decision === 'VERIFIED' ? document.getElementById('approve-kyc-btn') : document.getElementById('reject-kyc-btn');
+      RioEngine.applyButtonCooldown(btn, () => {
+        const res = RioAdmin.processKycVerification('kyc-rec-901', 'usr-applicant-88', decision, 'Blurry selfie / invalid document.');
+        if (res.success) {
+          alert(res.message);
+        }
+      });
+    }
+
+    function handleRecordRemittance() {
+      const btn = document.getElementById('record-remit-btn');
+      const amount = parseFloat(document.getElementById('remit-amount').value) || 0;
+
+      RioEngine.applyButtonCooldown(btn, () => {
+        if (amount <= 0) {
+          alert('Please enter a valid remittance amount.');
+          return;
+        }
+
+        const res = RioAdmin.processRiderRemittance('r-101', amount, 1250.00);
+        if (res.success) {
+          alert(res.message);
+          document.getElementById('remit-amount').value = '';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

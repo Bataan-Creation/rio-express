@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RioExpress - Customer Hub</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#E53935">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="rio-header">
+    <div>
+      <div class="rio-brand-title">RIOEXPRESS</div>
+      <div class="rio-brand-sub">Customer Dashboard</div>
+    </div>
+    <div>
+      <button onclick="RioAuth.logout()" style="background:rgba(229,57,53,0.2); color:#FF8A80; border:1px solid #E53935; padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer;">
+        LOGOUT
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="rio-container">
+
+    <!-- User Status Banner -->
+    <div class="rio-card rio-card-gold" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:11px; color:#94A3B8;">Welcome Back,</div>
+        <div id="user-display-name" style="font-size:15px; font-weight:bold; color:#FFD700;">Customer</div>
+      </div>
+      <span class="rio-badge-verified">VERIFIED USER</span>
+    </div>
+
+    <!-- Booking Form Card -->
+    <div class="rio-card">
+      <div class="rio-card-title">
+        <span>📦 Create Delivery Booking</span>
+      </div>
+
+      <label style="font-size: 12px; color: #94A3B8;">Pick-up Address / Merchant</label>
+      <input type="text" id="pickup-addr" class="rio-input" value="Poblacion Market, Morong">
+
+      <label style="font-size: 12px; color: #94A3B8;">Drop-off Barangay in Morong</label>
+      <select id="dropoff-brgy" class="rio-input" style="background:#0F172A;">
+        <option value="Poblacion">Poblacion (Inner Zone)</option>
+        <option value="Binaritan">Binaritan (2.0 KM)</option>
+        <option value="Sabang">Sabang (4.0 KM)</option>
+        <option value="Nagbalayong">Nagbalayong (5.5 KM)</option>
+        <option value="Mabayo">Mabayo / Border Zone (11.0 KM)</option>
+      </select>
+
+      <label style="font-size: 12px; color: #94A3B8;">Estimated Item Cost (PHP)</label>
+      <input type="number" id="item-cost" class="rio-input" placeholder="e.g. 600" value="600">
+
+      <button id="calc-btn" class="rio-btn-primary" onclick="handleCalculateFare()">
+        COMPUTE FARE & BREAKDOWN
+      </button>
+    </div>
+
+    <!-- Payment & Downpayment Summary Card -->
+    <div id="payment-summary-card" class="rio-card" style="display:none; border-color:#FFD700;">
+      <div class="rio-card-title" style="color:#FFD700;">
+        <span id="summary-title">Payment Breakdown</span>
+      </div>
+
+      <div style="font-size:13px; line-height:1.8; color:#CBD5E1; margin-bottom:15px;">
+        <div>Item Cost Estimate: <strong id="sum-item-cost" style="color:#FFF;">₱0.00</strong></div>
+        <div>Delivery Fee (Gas-Adjusted): <strong id="sum-delivery-fee" style="color:#FFF;">₱0.00</strong></div>
+        <hr style="border-color:rgba(255,255,255,0.1); margin:8px 0;">
+        <div style="font-size:15px; font-weight:bold;">Total Amount: <span id="sum-total-amount" style="color:#FFD700;">₱0.00</span></div>
+      </div>
+
+      <!-- Downpayment Box -->
+      <div id="downpayment-box" style="background:rgba(255,215,0,0.1); border:1px solid #FFD700; border-radius:10px; padding:12px; margin-bottom:15px; display:none;">
+        <div style="color:#FFD700; font-weight:bold; font-size:13px; margin-bottom:5px;">⚠️ 50% REQUIRED DOWNPAYMENT</div>
+        <div style="font-size:12px; color:#E2E8F0; margin-bottom:8px;">
+          Send <strong id="required-dp-amount" style="color:#FFD700;">₱0.00</strong> to official GCash:
+        </div>
+        <div style="background:#0A1128; padding:10px; border-radius:8px; text-align:center;">
+          <div style="font-size:16px; font-weight:bold; color:#FFF;">09365810610</div>
+          <div style="font-size:11px; color:#94A3B8;">Reynold P. / Bataan Creation</div>
+        </div>
+      </div>
+
+      <button id="book-btn" class="rio-btn-primary" onclick="handlePlaceOrder()">
+        CONFIRM & PLACE ORDER
+      </button>
+    </div>
+
+    <!-- Active Delivery OTP Display Card -->
+    <div id="active-otp-card" class="rio-card" style="display:none; text-align:center; border-color:#22C55E;">
+      <div style="font-size:12px; color:#22C55E; font-weight:bold; text-transform:uppercase;">Active Delivery OTP Code</div>
+      <div id="display-otp" style="font-size:36px; font-weight:900; letter-spacing:8px; color:#FFD700; margin:10px 0;">0000</div>
+      <div style="font-size:12px; color:#94A3B8;">Provide this 4-digit code to the rider upon receiving your package in Morong.</div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="rio-footer">
+    Developed & Powered by <strong>Bataan Creation</strong><br>
+    Owner: Reynold P. Rio (09365810610 / bataancreation@gmail.com)
+  </footer>
+
+  <!-- Required Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/customer.js"></script>
+  <script src="assets/js/guidelines.js"></script>
+  <script src="assets/js/chatbot.js"></script>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      // Enforce Role Guard
+      RioAuth.enforcePageGuard('CUSTOMER');
+      RioChatbot.initChatbotUI();
+
+      const user = RioAuth.getCurrentUser();
+      if (user) {
+        document.getElementById('user-display-name').innerText = user.fullName || user.phoneNumber;
+      }
+    });
+
+    // Handle Compute Fare
+    function handleCalculateFare() {
+      const btn = document.getElementById('calc-btn');
+      const itemCost = parseFloat(document.getElementById('item-cost').value) || 0;
+      const dropoffBrgy = document.getElementById('dropoff-brgy').value;
+
+      RioEngine.applyButtonCooldown(btn, () => {
+        // Morong Coordinates centroids
+        const pickupLat = RIO_CONFIG.MORONG_BARANGAYS['Poblacion'].lat;
+        const pickupLng = RIO_CONFIG.MORONG_BARANGAYS['Poblacion'].lng;
+
+        const targetBrgyData = RIO_CONFIG.MORONG_BARANGAYS[dropoffBrgy] || RIO_CONFIG.MORONG_BARANGAYS['Sabang'];
+        const dropoffLat = targetBrgyData.lat;
+        const dropoffLng = targetBrgyData.lng;
+
+        // Use Customer Engine
+        const breakdown = RioCustomer.calculateCheckout(itemCost, pickupLat, pickupLng, dropoffLat, dropoffLng);
+
+        if (breakdown) {
+          document.getElementById('sum-item-cost').innerText = '₱' + breakdown.itemCost.toFixed(2);
+          document.getElementById('sum-delivery-fee').innerText = '₱' + breakdown.deliveryFee.toFixed(2);
+          document.getElementById('sum-total-amount').innerText = '₱' + breakdown.totalAmount.toFixed(2);
+
+          const dpBox = document.getElementById('downpayment-box');
+          if (breakdown.requiresDownpayment) {
+            dpBox.style.display = 'block';
+            document.getElementById('required-dp-amount').innerText = '₱' + breakdown.requiredDownpayment.toFixed(2);
+          } else {
+            dpBox.style.display = 'none';
+          }
+
+          document.getElementById('payment-summary-card').style.display = 'block';
+        }
+      });
+    }
+
+    // Handle Confirm Order
+    function handlePlaceOrder() {
+      const btn = document.getElementById('book-btn');
+      const pickupAddress = document.getElementById('pickup-addr').value;
+      const dropoffBarangay = document.getElementById('dropoff-brgy').value;
+
+      RioEngine.applyButtonCooldown(btn, () => {
+        const payload = RioCustomer.prepareOrderPayload(
+          pickupAddress, 
+          dropoffBarangay + ' Destination, Morong, Bataan', 
+          dropoffBarangay
+        );
+
+        if (payload) {
+          alert('🎉 Booking Request Created Successfully!\nYour 4-Digit Delivery OTP is: ' + payload.delivery_otp);
+          document.getElementById('display-otp').innerText = payload.delivery_otp;
+          document.getElementById('active-otp-card').style.display = 'block';
+          document.getElementById('payment-summary-card').style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

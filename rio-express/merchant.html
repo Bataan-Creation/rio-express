@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RioExpress - Merchant Terminal</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#E53935">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="rio-header">
+    <div>
+      <div class="rio-brand-title">RIOEXPRESS</div>
+      <div class="rio-brand-sub">Merchant Partner Hub</div>
+    </div>
+    <div>
+      <button onclick="RioAuth.logout()" style="background:rgba(229,57,53,0.2); color:#FF8A80; border:1px solid #E53935; padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer;">
+        LOGOUT
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="rio-container">
+
+    <!-- Store Status & Operational Switch -->
+    <div class="rio-card rio-card-gold" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:11px; color:#94A3B8;">Partner Store</div>
+        <div id="merchant-name-display" style="font-size:15px; font-weight:bold; color:#FFD700;">Morong Grill & Diner</div>
+      </div>
+      <button id="store-status-btn" onclick="toggleStoreStatus()" style="background:#22C55E; color:#FFF; border:none; padding:8px 14px; border-radius:20px; font-weight:bold; font-size:11px; cursor:pointer;">
+        🟢 OPEN
+      </button>
+    </div>
+
+    <!-- Active Orders Management Card -->
+    <div class="rio-card">
+      <div class="rio-card-title">
+        <span>🍔 Incoming Store Orders</span>
+        <span class="rio-badge-verified">1 Pending Order</span>
+      </div>
+
+      <div style="font-size:13px; color:#CBD5E1; line-height:1.8; margin-bottom:15px; background:rgba(255,255,255,0.03); padding:12px; border-radius:10px; border:1px solid rgba(255,255,255,0.05);">
+        <div style="display:flex; justify-space-between; font-weight:bold; color:#FFD700; font-size:14px; margin-bottom:5px;">
+          <span>Order #ORD-7712</span>
+          <span>₱450.00</span>
+        </div>
+        <div>Customer: <strong>Reynold Rio (Poblacion)</strong></div>
+        <div>Items: <strong>2x BBQ Combo, 1x Extra Rice, 2x Ice Tea</strong></div>
+        <div>Delivery Option: <strong style="color:#22C55E;">RioExpress Fleet Rider</strong></div>
+        <hr style="border-color:rgba(255,255,255,0.1); margin:8px 0;">
+        <div style="font-size:11px; color:#94A3B8;">Downpayment Verified: <strong>GCash 09365810610</strong></div>
+      </div>
+
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <button id="accept-order-btn" class="rio-btn-primary" onclick="handleMerchantAction('ACCEPT')" style="background:linear-gradient(135deg, #22C55E, #15803D);">
+          ACCEPT ORDER
+        </button>
+        <button id="ready-order-btn" class="rio-btn-primary" onclick="handleMerchantAction('READY')" style="background:linear-gradient(135deg, #3B82F6, #1D4ED8);">
+          DISPATCH TO RIDER
+        </button>
+      </div>
+    </div>
+
+    <!-- Menu Item Management Card -->
+    <div class="rio-card">
+      <div class="rio-card-title">
+        <span>📋 Manage Store Menu & Inventory</span>
+      </div>
+
+      <label style="font-size: 12px; color: #94A3B8;">Item Name</label>
+      <input type="text" id="menu-item-name" class="rio-input" placeholder="e.g. Special Pork Sisig">
+
+      <label style="font-size: 12px; color: #94A3B8;">Price (PHP)</label>
+      <input type="number" id="menu-item-price" class="rio-input" placeholder="e.g. 180">
+
+      <button id="add-menu-btn" class="rio-btn-primary" onclick="handleAddMenuItem()">
+        + ADD ITEM TO STORE MENU
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="rio-footer">
+    Developed & Powered by <strong>Bataan Creation</strong><br>
+    Owner: Reynold P. Rio (09365810610 / bataancreation@gmail.com)
+  </footer>
+
+  <!-- Required Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/merchant.js"></script>
+  <script src="assets/js/guidelines.js"></script>
+  <script src="assets/js/chatbot.js"></script>
+
+  <script>
+    let isStoreOpen = true;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      RioAuth.enforcePageGuard('MERCHANT');
+      RioChatbot.initChatbotUI();
+
+      const user = RioAuth.getCurrentUser();
+      if (user) {
+        document.getElementById('merchant-name-display').innerText = user.fullName || 'Morong Partner Store';
+      }
+    });
+
+    function toggleStoreStatus() {
+      isStoreOpen = !isStoreOpen;
+      const btn = document.getElementById('store-status-btn');
+      if (isStoreOpen) {
+        btn.innerText = '🟢 OPEN';
+        btn.style.background = '#22C55E';
+      } else {
+        btn.innerText = '🔴 CLOSED';
+        btn.style.background = '#E53935';
+      }
+    }
+
+    function handleMerchantAction(action) {
+      const btn = action === 'ACCEPT' ? document.getElementById('accept-order-btn') : document.getElementById('ready-order-btn');
+      RioEngine.applyButtonCooldown(btn, () => {
+        if (action === 'ACCEPT') {
+          alert('✅ Order #ORD-7712 accepted! Please start preparing the items.');
+        } else {
+          alert('🚀 Order marked as READY FOR PICKUP! Notification sent to nearest RioExpress Rider in Morong.');
+        }
+      });
+    }
+
+    function handleAddMenuItem() {
+      const btn = document.getElementById('add-menu-btn');
+      const name = document.getElementById('menu-item-name').value;
+      const price = document.getElementById('menu-item-price').value;
+
+      RioEngine.applyButtonCooldown(btn, () => {
+        if (!name || !price) {
+          alert('Please enter both item name and price.');
+          return;
+        }
+
+        const result = RioMerchant.addMenuItem('m-store-101', name, price, 'Morong Food Special');
+        if (result.success) {
+          alert('🎉 ' + result.message);
+          document.getElementById('menu-item-name').value = '';
+          document.getElementById('menu-item-price').value = '';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

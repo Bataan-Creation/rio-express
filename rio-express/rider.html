@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>RioExpress - Rider Terminal</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#E53935">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="rio-header">
+    <div>
+      <div class="rio-brand-title">RIOEXPRESS</div>
+      <div class="rio-brand-sub">Rider Fleet Terminal</div>
+    </div>
+    <div>
+      <button onclick="RioAuth.logout()" style="background:rgba(229,57,53,0.2); color:#FF8A80; border:1px solid #E53935; padding:5px 10px; border-radius:6px; font-size:11px; cursor:pointer;">
+        LOGOUT
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="rio-container">
+
+    <!-- Rider Status & Duty Toggle Card -->
+    <div class="rio-card rio-card-gold" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:11px; color:#94A3B8;">Fleet Rider On-Duty</div>
+        <div id="rider-name-display" style="font-size:15px; font-weight:bold; color:#FFD700;">Rider Partner</div>
+      </div>
+      <button id="duty-btn" onclick="toggleDutyStatus()" style="background:#22C55E; color:#FFF; border:none; padding:8px 14px; border-radius:20px; font-weight:bold; font-size:11px; cursor:pointer;">
+        🟢 ONLINE
+      </button>
+    </div>
+
+    <!-- Active Job Acceptance Card -->
+    <div id="job-request-card" class="rio-card">
+      <div class="rio-card-title">
+        <span>🛵 Active Delivery Request</span>
+        <span class="rio-badge-verified">Sabang, Morong</span>
+      </div>
+
+      <div style="font-size:13px; color:#CBD5E1; line-height:1.8; margin-bottom:15px;">
+        <div>Pickup: <strong>Poblacion Public Market</strong></div>
+        <div>Drop-off: <strong>Barangay Sabang Resort Zone</strong></div>
+        <div>Est. Distance: <strong>4.0 KM</strong></div>
+        <hr style="border-color:rgba(255,255,255,0.1); margin:8px 0;">
+        <div>Item Cost: <strong>₱600.00</strong></div>
+        <div>Delivery Fee: <strong style="color:#22C55E;">₱60.00</strong></div>
+        <div>Downpayment Status: <strong style="color:#FFD700;">VERIFIED (50% GCash)</strong></div>
+        <div style="font-size:14px; font-weight:bold; color:#FFD700; margin-top:5px;">Remaining COD to Collect: ₱360.00</div>
+      </div>
+
+      <button id="accept-job-btn" class="rio-btn-primary" onclick="handleAcceptJob()">
+        ACCEPT DELIVERY JOB
+      </button>
+    </div>
+
+    <!-- Geofenced Anti-Scam Delivery Verification Terminal -->
+    <div id="verification-terminal" class="rio-card" style="display:none; border-color:#22C55E;">
+      <div class="rio-card-title" style="color:#22C55E;">
+        <span>🛡️ Anti-Scam Completion Terminal</span>
+      </div>
+
+      <!-- 50m Geofence Status Indicator -->
+      <div id="geofence-status-box" style="background:rgba(34,197,94,0.1); border:1px solid #22C55E; border-radius:10px; padding:10px; margin-bottom:15px; font-size:12px; color:#22C55E;">
+        📍 GPS Check: Rider is within 25m of Drop-off Address (Passed 50m Geofence).
+      </div>
+
+      <!-- Customer OTP Verification Input -->
+      <label style="font-size: 12px; color: #94A3B8;">Enter Customer 4-Digit OTP Code</label>
+      <input type="text" id="input-otp" class="rio-input" maxlength="4" placeholder="e.g. 5829" style="text-align:center; font-size:20px; letter-spacing:6px; font-weight:bold;">
+
+      <!-- 3-Point Photo Proof Checklist -->
+      <div style="font-size:12px; color:#FFD700; font-weight:bold; margin-bottom:8px;">📷 Required 3-Point Photo Proofs:</div>
+      
+      <label style="font-size: 11px; color: #94A3B8;">1. Store / Pickup Photo URL</label>
+      <input type="text" id="photo-store" class="rio-input" value="https://supabase.co/storage/store_proof_101.jpg">
+
+      <label style="font-size: 11px; color: #94A3B8;">2. Official Store Receipt Photo URL</label>
+      <input type="text" id="photo-receipt" class="rio-input" value="https://supabase.co/storage/receipt_proof_101.jpg">
+
+      <label style="font-size: 11px; color: #94A3B8;">3. Drop-off Photo with Landmark URL</label>
+      <input type="text" id="photo-dropoff" class="rio-input" value="https://supabase.co/storage/dropoff_proof_101.jpg">
+
+      <button id="complete-job-btn" class="rio-btn-primary" onclick="handleCompleteDelivery()">
+        VERIFY & COMPLETE DELIVERY
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="rio-footer">
+    Developed & Powered by <strong>Bataan Creation</strong><br>
+    Owner: Reynold P. Rio (09365810610 / bataancreation@gmail.com)
+  </footer>
+
+  <!-- Required Scripts -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/rider.js"></script>
+  <script src="assets/js/guidelines.js"></script>
+  <script src="assets/js/chatbot.js"></script>
+
+  <script>
+    let isOnline = true;
+    let currentMockOrder = {
+      id: 'ord-sabang-99',
+      item_cost: 600.00,
+      delivery_fee: 60.00,
+      total_amount: 660.00,
+      payment_status: 'PARTIAL_DOWNPAYMENT',
+      required_downpayment: 360.00,
+      remaining_balance: 300.00,
+      delivery_otp: '5829',
+      dropoff_lat: 14.6850,
+      dropoff_lng: 120.2310
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      RioAuth.enforcePageGuard('RIDER');
+      RioChatbot.initChatbotUI();
+
+      const user = RioAuth.getCurrentUser();
+      if (user) {
+        document.getElementById('rider-name-display').innerText = user.fullName || user.phoneNumber;
+      }
+    });
+
+    function toggleDutyStatus() {
+      isOnline = !isOnline;
+      const btn = document.getElementById('duty-btn');
+      if (isOnline) {
+        btn.innerText = '🟢 ONLINE';
+        btn.style.background = '#22C55E';
+      } else {
+        btn.innerText = '🔴 OFFLINE';
+        btn.style.background = '#E53935';
+      }
+    }
+
+    function handleAcceptJob() {
+      const btn = document.getElementById('accept-job-btn');
+      RioEngine.applyButtonCooldown(btn, () => {
+        RioRider.setActiveJob(currentMockOrder);
+        alert('Job Accepted! Proceed to pickup at Poblacion and deliver to Sabang.');
+        document.getElementById('job-request-card').style.display = 'none';
+        document.getElementById('verification-terminal').style.display = 'block';
+      });
+    }
+
+    function handleCompleteDelivery() {
+      const btn = document.getElementById('complete-job-btn');
+      const inputOtp = document.getElementById('input-otp').value;
+      const pStore = document.getElementById('photo-store').value;
+      const pReceipt = document.getElementById('photo-receipt').value;
+      const pDropoff = document.getElementById('photo-dropoff').value;
+
+      RioEngine.applyButtonCooldown(btn, () => {
+        // Simulated current GPS near Sabang dropoff
+        const riderLat = 14.6851;
+        const riderLng = 120.2311;
+
+        const result = RioRider.verifyAndCompleteDelivery(
+          inputOtp, 
+          pStore, 
+          pReceipt, 
+          pDropoff, 
+          riderLat, 
+          riderLng
+        );
+
+        if (result.success) {
+          alert(result.message);
+          document.getElementById('verification-terminal').style.display = 'none';
+          document.getElementById('job-request-card').style.display = 'block';
+        } else {
+          alert(result.message);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
